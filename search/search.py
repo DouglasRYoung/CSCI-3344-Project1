@@ -86,48 +86,46 @@ def depthFirstSearch(problem):
     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
-     #Get Starting Node and Starting State
-    startState = problem.getStartState()
+    stack = util.Stack()
+    startNode = problem.getStartState()
+    cost = 0
+    action = []
+    visited = {}
+    stack.push((startNode, action, cost))
+    while not stack.isEmpty():
+        current = stack.pop()
+        if problem.isGoalState(current[0]):
+            return current[1]
 
-    startNode = (startState, [])
-    #Use Stack method of DFS
-    #Use Stack method of DFS
-    base = util.Stack()
-    #What states we have already been too
-    nodesFound = []     #(state, cost)
-
-
-    #---- Begin with Starting Node ----
-    #Push Starting Node
-    base.push(startNode)
-
-    #---- Begin Going Through States ----
-    while not base.isEmpty():
-        #Get the current state and actions list out of the top of the stack 
-        currentNode, actions = base.pop()
-        #Check if currentState is inside our found Nodes/States
-        if currentNode not in nodesFound:
-            nodesFound.append(currentNode)
-        #Check if Node/State is at Goal State
-            if problem.isGoalState(currentNode):
-                return actions
-        #If not Goal State but inside inside NodesFound then we want the successors of Node
-            else: 
-                successors = problem.getSuccessors(currentNode)  #List of [(successor, action, stepCost)..]
-                
-                #push each successor to stack
-                for successorState, succAction, succstepCost in successors:
-                    actionNow = actions + [succAction]
-                    stateNow = (successorState, actionNow)
-                    base.push(stateNow)
-
-    return actions
-  # util.raiseNotDefined()
+        if current[0] not in visited:
+            visited[current[0]] = True
+            for next, act, co in problem.getSuccessors(current[0]):
+                if next and next not in visited:
+                    stack.push((next, current[1] + [act], current[2] + co))
+        
+    "util.raiseNotDefined()"
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    queue = util.Queue()
+    startNode = problem.getStartState()
+    cost = 0
+    action = []
+    visited = {}
+    queue.push((startNode, action, cost))
+    while not queue.isEmpty():
+        current = queue.pop()
+        if problem.isGoalState(current[0]):
+            return current[1]
+
+        if current[0] not in visited:
+            visited[current[0]] = True
+            for next, act, co in problem.getSuccessors(current[0]):
+                if next and next not in visited:
+                    queue.push((next, current[1] + [act], current[2] + co))
+        
+    "util.raiseNotDefined()"
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
