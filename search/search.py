@@ -86,8 +86,43 @@ def depthFirstSearch(problem):
     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+     #Get Starting Node and Starting State
+    startState = problem.getStartState()
+
+    startNode = (startState, [])
+    #Use Stack method of DFS
+    #Use Stack method of DFS
+    base = util.Stack()
+    #What states we have already been too
+    nodesFound = []     #(state, cost)
+
+
+    #---- Begin with Starting Node ----
+    #Push Starting Node
+    base.push(startNode)
+
+    #---- Begin Going Through States ----
+    while not base.isEmpty():
+        #Get the current state and actions list out of the top of the stack 
+        currentNode, actions = base.pop()
+        #Check if currentState is inside our found Nodes/States
+        if currentNode not in nodesFound:
+            nodesFound.append(currentNode)
+        #Check if Node/State is at Goal State
+            if problem.isGoalState(currentNode):
+                return actions
+        #If not Goal State but inside inside NodesFound then we want the successors of Node
+            else: 
+                successors = problem.getSuccessors(currentNode)  #List of [(successor, action, stepCost)..]
+                
+                #push each successor to stack
+                for successorState, succAction, succstepCost in successors:
+                    actionNow = actions + [succAction]
+                    stateNow = (successorState, actionNow)
+                    base.push(stateNow)
+
+    return actions
+  # util.raiseNotDefined()
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
@@ -96,8 +131,45 @@ def breadthFirstSearch(problem):
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+     #Get Starting Node and Starting State
+    startState = problem.getStartState()
+    
+    #Now we add a cost to our starting Node (state, action, cost)
+    startNode = (startState, [], 0)
+    #Use PriorityQueue method for UCS
+    base = util.PriorityQueue()
+    #What states we have already been too, holds the cost now
+    nodesFound = {}    #(state, cost)
+
+     #---- Begin with Starting Node ----
+
+    #Push Starting Node
+    base.push(startNode, 0)
+
+    #---- Begin Going Through States ----
+    while not base.isEmpty():
+        #Get the current state and actions list and Cost out of the top of the PriorityQueue 
+        currentNode, actions, currentCost = base.pop()
+
+        #Check if currentState is inside our found Nodes/States
+        if (currentNode not in nodesFound) or (currentCost < nodesFound[currentNode]):
+            nodesFound[currentNode] = currentCost
+        
+            #Check if Node/State is at Goal State
+            if problem.isGoalState(currentNode):
+                return actions
+            #If not Goal State but inside inside NodesFound then we want the successors of Node
+            else: 
+                successors = problem.getSuccessors(currentNode)  #List of [(successor, action, stepCost)..]
+                
+                #push each successor to priority Queue
+                for successorState, succAction, succstepCost in successors:
+                    actionNow = actions + [succAction]
+                    costNow = currentCost + succstepCost
+                    stateNow = (successorState, actionNow, costNow)
+                    base.update(stateNow, costNow)
+
+    return actions
 
 def nullHeuristic(state, problem=None):
     """
