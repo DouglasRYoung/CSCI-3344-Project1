@@ -288,6 +288,21 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
+        import math
+        self.visited = []
+        closest = (0,0)
+        dist = -1
+        closestDist = -1
+        for corner in self.corners :
+            startX, startY = self.startingPosition
+            cornerX, cornerY = corner
+            dist = math.sqrt((startX - cornerX)**2 + (startY - cornerY)**2)
+            if (closestDist == -1) or (dist < closestDist) :
+                closest = corner
+        self.closestCorner = closest
+        self.remainingCorners = []
+        for corner in self.corners :
+            self.remainingCorners + [corner]
 
     def getStartState(self):
         """
@@ -295,14 +310,32 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return self.startingPosition
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        import math
+        if state in self.corners :
+            self.visited + [state]
+            self.remainingCorners.remove(state)
+            closest = (0,0)
+            dist = -1
+            closestDist = -2
+            for corner in self.remainingCorners :
+                x,y = state
+                cornerX, cornerY = corner
+                dist = math.sqrt((x - cornerX)**2 + (y - cornerY)**2)
+                if (closestDist == -1) or (dist < closestDist) :
+                    closest = corner
+            self.closestCorner = closest
+            
+        if len(self.remainingCorners) == 0:
+            return True
+        else:
+            return False
 
     def getSuccessors(self, state):
         """
@@ -325,6 +358,12 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
+            x, y = self.startingPosition
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            hitsWall = self.walls[nextx][nexty]
+            if not hitsWall :
+                successors + [(nextx, nexty)]
 
         self._expanded += 1 # DO NOT CHANGE
         return successors
@@ -360,7 +399,14 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    import math
+    if state is None:
+        return 0
+    x, y = state
+    cornerX, cornerY = problem.closestCorner
+#    cornerX, cornerY = problem.corners[0]
+    heuristicCost = (math.sqrt((x - cornerX)**2 + (y - cornerY)**2))/10
+    return heuristicCost # Default to trivial solution
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -454,7 +500,31 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+    import math
+    
+    if problem.isGoalState(state):
+        return 0
+    
+    x, y = position
+    startCoord, grid = problem.getStartState()
+    foodCoords = foodGrid.asList()
+    
+    closestFood = (-1,-1)
+    closestDist = -1
+    for foodx, foody in foodCoords:
+        dist = (math.sqrt((x - foodx)**2 + (y - foody)**2))
+        if (closestDist == -1) or (dist < closestDist):
+            closestDist = dist
+            closestFood = (foodx, foody)
+    
+    closestx, closesty = closestFood
+    
+#    heuristicCost = (math.sqrt((x - closestx)**2 + (y - closesty)**2))/7
+#    heuristicCost = len(problem.getSuccessors(state))
+#    heuristicCost = abs((x - closestx)) + abs((y - closesty))
+    heuristicCost = mazeDistance(position, closestFood, problem.startingGameState)
+    
+    return heuristicCost
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
