@@ -142,6 +142,7 @@ class AsynchronousValueIterationAgent(ValueIterationAgent):
         (see mdp.py) on initialization and runs cyclic value iteration
         for a given number of iterations using the supplied
         discount factor.
+
     """
     def __init__(self, mdp, discount = 0.9, iterations = 1000):
         """
@@ -163,6 +164,26 @@ class AsynchronousValueIterationAgent(ValueIterationAgent):
 
     def runValueIteration(self):
         "*** YOUR CODE HERE ***"
+        #Get All Possible States 
+        allStates = self.mdp.getStates()
+        #Get the amount of all possible states
+        numOfStates = len(allStates)
+        #Iterate through game boards
+        for i in range(self.iterations):
+            #Must select states one by one: So use % to remainder as 1 through numOfStates
+            curState = allStates[i % numOfStates]
+            #Check if Terminal
+            if self.mdp.isTerminal(curState):
+                continue
+            #If Not Terminal, then finish 
+            else:
+                values = []
+                for curAction in self.mdp.getPossibleActions(curState):
+                    curQValue = self.computeQValueFromValues(curState, curAction)
+                    values.append(curQValue)
+                self.values[curState] = max(values)
+                    
+
 
 class PrioritizedSweepingValueIterationAgent(AsynchronousValueIterationAgent):
     """
