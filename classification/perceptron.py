@@ -89,7 +89,7 @@ class PerceptronClassifier:
         weightsList = self.weights[label]
 
         #Go through 1-100 to get largest weights and add to list
-        for i in range(100):
+        for ii in range(100):
                 #Find max weight number i
                 maxWeighti = weightsList.argMax()
                 #Put weight in list
