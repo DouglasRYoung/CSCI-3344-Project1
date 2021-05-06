@@ -61,7 +61,48 @@ class MiraClassifier:
         representing a vector of values.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+                labels = util.Counter()
+        weight = util.Counter()
+        
+        score = 0	
+        
+        count = util.Counter()
+        
+        for c in Cgrid:
+                for iteration in range(self.max_iterations):
+                        for i in range(len(trainingData)):
+                        
+                            for label in self.legalLabels:
+                                labels[label] = trainingData[i].__mul__(self.weights[label])
+                                
+                            if not(trainingLabels[i] == labels.argMax()):
+                                current = trainingData[i]
+                                trueLabel = trainingLabels[i]
+                                bestLabel = labels.argMax()
+                                
+                                minimize = ((self.weights[bestLabel].__sub__(self.weights[trueLabel])).__mul__(current) + 1.0) / (2.0 * (current.__mul__(current))) 
+                                t = min(minimize,c)
+                                
+                                margin = util.Counter()	
+                                
+                                for key in trainingData[i].keys():
+                                    margin[key] = trainingData[i][key]*t
+                                    
+                                self.weights[trainingLabels[i]].__radd__(margin)
+                                self.weights[labels.argMax()].__sub__(margin)
+                                
+                weight[c] = self.weights
+                
+                for i in range(len(validationData)):
+                    for l in validationLabels:
+                        labels[l] = validationData[i].__mul__(self.weights[l])
+                        
+                    if (validationLabels[i] == labels.argMax()):
+                        score += 1	
+                        
+                count[c] = score
+                
+        self.weights = weight[count.argMax()]
 
     def classify(self, data ):
         """
