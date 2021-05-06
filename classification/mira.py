@@ -61,7 +61,7 @@ class MiraClassifier:
         representing a vector of values.
         """
         "*** YOUR CODE HERE ***"
-                labels = util.Counter()
+        labels = util.Counter()
         weight = util.Counter()
         
         score = 0	

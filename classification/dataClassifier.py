@@ -75,29 +75,58 @@ def enhancedFeatureExtractorDigit(datum):
 
     ##
     """
+    # Make Sure I am using Digit's Data Not Face
     features =  basicFeatureExtractorDigit(datum)
     pixels = datum.getPixels()
     
-    #Pixels at top	
-    top = 0
-    #Pixels at bottom
-    bottom = 0
-    #How long without pixels
-    breakCount = 0
-    #Pixels on in row
-    pixelOnCount = 0
 
-     for i in range(len(pixels)):
-        row = pixels[i]
-        for j in range(len(row)):
-           if row[j] != 0 
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # Compute horizonatal and vertical gradients - Using the ability to have 3 Binary Featuresa.
+    # Use Int(To Encapsulate Horizontal and Vertical)
+    #For More Information, Look at Second to last Reference  
+    for x in range(1, DIGIT_DATUM_WIDTH):
+        for y in range(1, DIGIT_DATUM_HEIGHT):
+            features[("horizontal", x, y)] = int(datum.getPixel(x, y) >
+                                            datum.getPixel(x - 1, y))
+
+            features[("vertical", x, y)] = int(datum.getPixel(x, y) >
+                                            datum.getPixel(x, y - 1))
+
+    # This Function Will Check for continuous regions of pixels turned on, Hopefully being able to help results
+    def getContinousPixels(x, y):
+	#We Will use List Neighbors for the rest to keep hold of Neighbors locations to throw into Feautures
+        neighbors = []
+        if x > 0:
+            neighbors.append((x - 1, y))
+        if x < DIGIT_DATUM_WIDTH - 1:
+            neighbors.append((x + 1, y))
+        if y > 0:
+            neighbors.append((x, y - 1))
+        if y < DIGIT_DATUM_HEIGHT - 1:
+            neighbors.append((x, y + 1))
+        return neighbors
+
+    region = set()
+    contiguous = 0
+    for x in xrange(DIGIT_DATUM_WIDTH):
+        for y in xrange(DIGIT_DATUM_HEIGHT):
+            if (x, y) not in region and datum.getPixel(x, y) < 2:
+                contiguous += 1
+                stack = [(x, y)]
+		#Where the magic happens!
+                while stack:
+                    point = stack.pop()
+                    region.add(point)
+                    for neighbor in getContinousPixels(*point):
+                        if datum.getPixel(*neighbor) < 2 and neighbor not in region:
+                            stack.append(neighbor)
+
+    features["0"] = contiguous % 2
+
+    features["1"] = (contiguous >> 1) % 2
+
+    features["2"] = (contiguous >> 2) % 2
 
     return features
-
-
-
 def basicFeatureExtractorPacman(state):
     """
     A basic feature extraction function.
