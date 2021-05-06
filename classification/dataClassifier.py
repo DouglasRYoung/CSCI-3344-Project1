@@ -76,7 +76,21 @@ def enhancedFeatureExtractorDigit(datum):
     ##
     """
     features =  basicFeatureExtractorDigit(datum)
+    pixels = datum.getPixels()
+    
+    #Pixels at top	
+    top = 0
+    #Pixels at bottom
+    bottom = 0
+    #How long without pixels
+    breakCount = 0
+    #Pixels on in row
+    pixelOnCount = 0
 
+     for i in range(len(pixels)):
+        row = pixels[i]
+        for j in range(len(row)):
+           if row[j] != 0 
     "*** YOUR CODE HERE ***"
     util.raiseNotDefined()
 
